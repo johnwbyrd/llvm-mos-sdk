@@ -4,17 +4,31 @@ project(llvm-mos-sdk
   HOMEPAGE_URL "https://github.com/johnwbyrd/llvm-mos-sdk"
   LANGUAGES C CXX
 )
-
+`
 include(ExternalProject)
 include(CMakePrintHelpers)
 
 ExternalProject_Add( llvm-mos
   GIT_REPOSITORY https://github.com/johnwbyrd/llvm-mos.git
   GIT_PROGRESS 1
-  CMAKE_CACHE_ARGS -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD:STRING=MOS -DLLVM_ENABLE_PROJECTS:STRING=clang\;lld -DLLVM_LIT_TOOLS_DIR:STRING=C:/Program\ Files/git/usr/bin
-  CMAKE_ARGS ${CMAKE_ARGS} -G Ninja -DLLVM_OPTIMIZED_TABLEGEN=1 -DLIBXML2_LIBRARIES=IGNORE -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=ON -DLLVM_TARGETS_TO_BUILD=all ../llvm-mos/llvm
-  TEST_COMMAND cmake --target check-all
-  INSTALL_COMMAND cmake --target install
+  CMAKE_CACHE_ARGS 
+    -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD:STRING=MOS
+    -DLLVM_ENABLE_PROJECTS:STRING=clang\;clang-tools-extra\;lld\;lldb
+    -DLLVM_LIT_TOOLS_DIR:STRING=C:/Program\ Files/git/usr/bin
+    -DCMAKE_INSTALL_PREFIX:STRING=<INSTALL_DIR>/install
+    -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+    -DCMAKE_C_COMPILER_LAUNCHER:FILEPATH=${CMAKE_C_COMPILER_LAUNCHER}
+    -DCMAKE_CXX_COMPILER_LAUNCHER:FILEPATH=${CMAKE_CXX_COMPILER_LAUNCHER}
+    -DLLVM_OPTIMIZED_TABLEGEN:BOOL=ON
+    -DLIBXML2_LIBRARIES:STRING=IGNORE
+    -DCMAKE_BUILD_TYPE:STRING=Release
+    -DLLVM_ENABLE_ASSERTIONS:BOOL=ON
+    -DLLVM_TARGETS_TO_BUILD:STRING=all
+  CMAKE_ARGS 
+     ../llvm-mos/llvm
+  TEST_COMMAND cmake --build . --target distribution
+  TEST_BEFORE_INSTALL 1
   USES_TERMINAL_DOWNLOAD 1
   USES_TERMINAL_UPDATE 1
   USES_TERMINAL_CONFIGURE 1
@@ -22,9 +36,3 @@ ExternalProject_Add( llvm-mos
   USES_TERMINAL_INSTALL 1
   USES_TERMINAL_TEST 1
 )
-
-# get_cmake_property(_variableNames VARIABLES)
-# list (SORT _variableNames)
-# foreach (_variableName ${_variableNames})
-#     message(STATUS "${_variableName}=${${_variableName}}")
-# endforeach()
