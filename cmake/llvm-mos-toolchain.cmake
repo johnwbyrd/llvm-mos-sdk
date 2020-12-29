@@ -46,7 +46,7 @@ set(CMAKE_CXX_LINK_EXECUTABLE
 include(CMakeDetermineASMCompiler)
 include(CMakeFindBinUtils)
 
-string(APPEND CMAKE_ASM_FLAGS "-triple mos -filetype obj")
+string(APPEND CMAKE_ASM_FLAGS "-triple ${LLVM_MOS_TRIPLE} -filetype obj")
 string(APPEND CMAKE_ASM_DEBUG_FLAGS "-g")
 
 macro(print_all_variables)
