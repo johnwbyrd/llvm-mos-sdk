@@ -1,50 +1,130 @@
 cmake_minimum_required(VERSION 3.17)
 project(llvm-mos-sdk 
   DESCRIPTION "LLVM-based SDK for the MOS 65xx series of processors"
-  HOMEPAGE_URL "https://github.com/johnwbyrd/llvm-mos-sdk"
+  HOMEPAGE_URL "https://github.com/llvm-mos/llvm-mos-sdk"
   LANGUAGES C CXX ASM
 )
 
-set(LLVM_MOS_CMAKE_MODULES_DIR ${CMAKE_SOURCE_DIR}/cmake
-	CACHE PATH "Path to required CMake modules")
-set(CMAKE_MODULE_PATH ${LLVM_MOS_CMAKE_MODULES_DIR}
-  CACHE PATH "Path to required CMake modules")
-set(LLVM_MOS_GIT_REPOSITORY https://github.com/johnwbyrd/llvm-mos.git 
-  CACHE STRING "The git repository to download llvm-mos from")
+set(CMAKE_SYSTEM_NAME "llvm-mos")
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
+  CACHE PATH "Path to CMake modules required to build ${PROJECT_NAME}")
+set(LLVM_MOS_ASSEMBLER_NAME "llvm-mc"
+  CACHE STRING "Name of assembler program")
+set(LLVM_MOS_ASSEMBLER_DETECTION_STRING "mos"
+  CACHE STRING "Word to detect in assembler --version command to prove support for llvm-mos")
+set(LLVM_MOS_TRIPLE "mos"
+  CACHE STRING "LLVM triple to use to target MOS processors")
 
-include(ExternalProject)
+# Verify that the compiler is Clang
+# include(CMakeDetermineCCompiler)
+if(NOT ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+  message(FATAL_ERROR "The C compiler must be clang with MOS target support (current compiler is ${CMAKE_C_COMPILER_ID})")
+endif()
 
-ExternalProject_Add( llvm-mos
-  GIT_REPOSITORY ${LLVM_MOS_GIT_REPOSITORY}
-  GIT_PROGRESS 1
-  CMAKE_ARGS
-    -C ${LLVM_MOS_CMAKE_MODULES_DIR}/llvm-mos.cmake
-     <SOURCE_DIR>/llvm
-  CMAKE_CACHE_ARGS 
-    -DCMAKE_INSTALL_PREFIX:STRING=<INSTALL_DIR>/llvm-mos
-    -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-    -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-  TEST_COMMAND cmake --build . --target distribution
-  TEST_BEFORE_INSTALL 1
-  USES_TERMINAL_DOWNLOAD 1
-  USES_TERMINAL_UPDATE 1
-  USES_TERMINAL_CONFIGURE 1
-  USES_TERMINAL_BUILD 1
-  USES_TERMINAL_INSTALL 1
-  USES_TERMINAL_TEST 1
-)
+# Verify that the compiler supports the MOS target
+# FIXME:
 
-if (NOT DEFINED LLVM_MOS_INSTALL_DIR)
-  ExternalProject_Get_Property( llvm-mos INSTALL_DIR)
-  set( LLVM_MOS_INSTALL_DIR ${INSTALL_DIR}/llvm-mos
-    CACHE PATH "Root of llvm-mos build products directory")
-endif(NOT DEFINED LLVM_MOS_INSTALL_DIR)
+# Verify that llvm-mc exists
+get_filename_component(LLVM_MOS_C_COMPILER_DIR ${CMAKE_C_COMPILER} DIRECTORY)
+set(LLVM_MOS_ORIIGNAL_ASM_DIR "NOTFOUND")
+if (${CMAKE_ASM_COMPILER})
+  get_filename_component(LLVM_MOS_ORIGINAL_ASM_DIR ${CMAKE_ASM_COMPILER} DIRECTORY)
+endif()
+find_program(LLVM_MOS_LLVM_MC_PATH 
+  NAMES ${LLVM_MOS_ASSEMBLER_NAME}
+  HINTS ${LLVM_MOS_C_COMPILER_DIR} ${LLVM_MOS_ORIGINAL_ASM_DIR}
+  )
+if (LLVM_MOS_LLVM_MC_PATH STREQUAL LLVM_MOS_LLVM_MC_PATH-NOTFOUND)
+  message(FATAL_ERROR "Could not find ${LLVM_MOS_ASSEMBLER_NAME}; this can be built from the llvm-mos compiler distribution")
+else()
+  message(STATUS "Found ${LLVM_MOS_ASSEMBLER_NAME} at ${LLVM_MOS_LLVM_MC_PATH}")
+endif()
 
-if (NOT DEFINED LLVM_MOS_BINARY_DIR)
-  ExternalProject_Get_Property( llvm-mos INSTALL_DIR)
-  set( LLVM_MOS_BINARY_DIR ${LLVM_MOS_INSTALL_DIR}/bin
-    CACHE PATH "Binary path to llvm and clang executables to be used to build samples and libraries")
-endif(NOT DEFINED LLVM_MOS_BINARY_DIR)
+# Verify that llvm-mc supports MOS as a target
+execute_process(COMMAND ${LLVM_MOS_LLVM_MC_PATH} --version
+                    OUTPUT_VARIABLE LLVM_MOS_LLVM_MC_VERSION_RESULT)
+if (NOT ${LLVM_MOS_LLVM_MC_VERSION_RESULT} MATCHES ${LLVM_MOS_ASSEMBLER_DETECTION_STRING})
+  message(FATAL_ERROR "${LLVM_MOS_ASSEMBLER_NAME} does not support MOS target; build a version that does from the llvm-mos compiler distribution" )
+else()
+  message(STATUS "Support for ${LLVM_MOS_ASSEMBLER_DETECTION_STRING} target detected in ${LLVM_MOS_LLVM_MC_PATH}")
+endif()
+
+# Remember the path of llvm-mc and search it in the future
+get_filename_component(LLVM_MOS_TOOL_DIR ${LLVM_MOS_LLVM_MC_PATH} DIRECTORY)
+list(APPEND CMAKE_PROGRAM_PATH ${LLVM_MOS_TOOL_DIR})
+# If there's a bin directory in the build directory, throw that in as well
+list(APPEND CMAKE_PROGRAM_PATH ${CMAKE_BINARY_DIR}/bin)
+list(REMOVE_DUPLICATES CMAKE_PROGRAM_PATH)
+
+set(CMAKE_ASM_COMPILER_ID ${LLVM_MOS_ASSEMBLER_NAME})
+set(CMAKE_ASM_COMPILER ${LLVM_MOS_LLVM_MC_PATH})
+
+list(APPEND CMAKE_ASM${ASM_DIALECT}_COMPILER_ID_VENDORS llvm-mc )
+set(CMAKE_ASM${ASM_DIALECT}_COMPILER_ID_VENDOR_FLAGS_Clang "--version")
+set(CMAKE_ASM${ASM_DIALECT}_COMPILER_ID_VENDOR_REGEX_Clang "(llvm-mc version)")
+
+include(CMakeDetermineASMCompiler)
+
+function(llvm_mos_set_env name value)
+    find_program(
+        LLVM_MOS_TOOL_PATH_${name}
+        ${value}
+        HINTS ${LLVM_MOS_TOOL_DIR} ${CMAKE_PROGRAM_PATH}
+        NO_DEFAULT_PATH
+        REQUIRED
+     )
+    set(${name} ${LLVM_MOS_TOOL_PATH_${name}} PARENT_SCOPE CACHE PATH )
+endfunction()
+
+if(false)
+llvm_mos_set_env(CMAKE_ADDR2LINE llvm-addr2line)
+llvm_mos_set_env(CMAKE_ASM_COMPILER llvm-mc)
+llvm_mos_set_env(CMAKE_ASM_COMPILER_AR llvm-ar)
+llvm_mos_set_env(CMAKE_AR llvm-ar)
+llvm_mos_set_env(CMAKE_C_COMPILER clang)
+llvm_mos_set_env(CMAKE_CXX_COMPILER clang++)
+llvm_mos_set_env(CMAKE_DLLTOOL llvm-dlltool)
+llvm_mos_set_env(CMAKE_LINKER lld)
+llvm_mos_set_env(CMAKE_MT llvm-mt)
+llvm_mos_set_env(CMAKE_NM llvm-nm)
+llvm_mos_set_env(CMAKE_READELF llvm-readelf)
+llvm_mos_set_env(CMAKE_OBJCOPY llvm-objcopy)
+llvm_mos_set_env(CMAKE_OBJDUMP llvm-objdump)
+llvm_mos_set_env(CMAKE_RANLIB llvm-ranlib)
+llvm_mos_set_env(CMAKE_RC llvm-rc)
+llvm_mos_set_env(CMAKE_STRIP llvm-strip)
+endif()
+
+set(CMAKE_LINKER "${LLVM_MOS_TOOL_DIR}/lld")
+
+set(_CMAKE_TOOLCHAIN_LOCATION ${LLVM_MOS_TOOL_DIR})
+
+set(CMAKE_ASM_COMPILE_OBJECT
+     "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>")
+set(CMAKE_ASM_LINK_EXECUTABLE
+    "${CMAKE_LINKER} -flavor gnu <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_C_LINK_EXECUTABLE
+    "<CMAKE_LINKER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_CXX_LINK_EXECUTABLE
+    "<CMAKE_LINKER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+
+set(CMAKE_EXECUTABLE_SUFFIX ".elf")
+
+# At this point, we should know the path for most of the llvm-mos tools.
+# Find llvm-ar, llvm-addr2line, etc. on that path.
+include(CMakeFindBinUtils)
+string(APPEND CMAKE_ASM_FLAGS "-triple ${LLVM_MOS_TRIPLE} -filetype obj")
+string(APPEND CMAKE_ASM_DEBUG_FLAGS_INIT "-g")
+
+macro(print_all_variables)
+    message(STATUS "print_all_variables------------------------------------------{")
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+    message(STATUS "print_all_variables------------------------------------------}")
+endmacro()
+
+# print_all_variables()
 
 add_subdirectory(src)
