@@ -7,7 +7,7 @@ include_guard(GLOBAL)
 if(NOT ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
   message(FATAL_ERROR "The C compiler must be clang with MOS target support \
   (current compiler is ${CMAKE_C_COMPILER_ID}). \
-  Reconfigure with the CMAKE_C_COMPILER and CMAKE_CXX_COMPILER CMake settings \
+  Reconfigure with the CMAKE_C_COMPILER CMake settings \
   pointing to the llvm-mos versions.")
 endif()
 

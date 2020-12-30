@@ -7,7 +7,9 @@ include(llvm-mos/VerifyCompilers)
 include(llvm-mos/ToolchainFlags)
 
 # Remember the path of llvm-mc and search it in the future
-get_filename_component(LLVM_MOS_TOOL_DIR ${LLVM_MOS_LLVM_MC_PATH} DIRECTORY)
+get_filename_component(LLVM_MOS_TOOL_DIR_EXTRACTED ${LLVM_MOS_LLVM_MC_PATH} DIRECTORY)
+set(LLVM_MOS_TOOL_DIR ${LLVM_MOS_TOOL_DIR_EXTRACTED}
+  CACHE PATH "Path to Clang and LLVM tools with MOS target support")
 set(_CMAKE_TOOLCHAIN_LOCATION ${LLVM_MOS_TOOL_DIR})
 list(APPEND CMAKE_PROGRAM_PATH ${LLVM_MOS_TOOL_DIR})
 # If there's a bin directory in the build directory, throw that in as well
