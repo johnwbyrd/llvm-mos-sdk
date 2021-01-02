@@ -30,9 +30,11 @@ if (NOT LLVM_MOS_CCACHE STREQUAL "LLVM_MOS_CCACHE-NOTFOUND")
         CACHE PATH "Path to C compiler caching program")
     set(CMAKE_CXX_COMPILER_LAUNCHER ${LLVM_MOS_CCACHE}
         CACHE PATH "Path to C++ compiler caching program")
-    message(STATUS "Compiler caching program found at ${CMAKE_C_COMPILER_LAUNCHER}")
+    message(STATUS "Compiler caching program found at \
+        ${CMAKE_C_COMPILER_LAUNCHER}")
 else()
-    message(STATUS "Compiler caching program not found, compilation may be slower")
+    message(STATUS "Compiler caching program not found, \
+        compilation may be slower")
 endif()
 
 # Ship the release with these tools
