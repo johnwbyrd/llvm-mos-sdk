@@ -16,5 +16,22 @@ function(llvm_mos_add_executable)
             $<TARGET_FILE:${base_name}>
             $<TARGET_FILE_DIR:${base_name}>/$<TARGET_FILE_BASE_NAME:${base_name}>${LLVM_MOS_STRIPPED_EXECUTABLE_SUFFIX}
     )
+# Since we're here, we can generate a ton of debugging information, if the 
+# user wants, about the link we just did.
+    if(LLVM_MOS_GENERATE_LINK_REPORTS)
+        add_custom_command(
+            TARGET ${base_name}
+            POST_BUILD
+            COMMAND ${CMAKE_READELF} --all
+                $<TARGET_FILE:${base_name}> >
+                $<TARGET_FILE_DIR:${base_name}>/$<TARGET_FILE_BASE_NAME:${base_name}>.readelf
+            COMMAND ${CMAKE_OBJDUMP} --all-headers --print-imm-hex -D
+                $<TARGET_FILE:${base_name}> >
+                $<TARGET_FILE_DIR:${base_name}>/$<TARGET_FILE_BASE_NAME:${base_name}>.objdump
+            COMMAND ${CMAKE_DWARFDUMP} --all -v
+                $<TARGET_FILE:${base_name}> >
+                $<TARGET_FILE_DIR:${base_name}>/$<TARGET_FILE_BASE_NAME:${base_name}>.dwarfdump
+        )
+    endif()
 endfunction()
 

@@ -2,6 +2,8 @@
 # Constants for the llvm-mos build
 include_guard(GLOBAL)
 
+set(LLVM_MOS_GENERATE_LINK_REPORTS "ON"
+  CACHE STRING "Generate detailed objdump and dwarfdump files when linking")
 set(CMAKE_SYSTEM_NAME "llvm-mos")
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
   CACHE PATH "Path to CMake modules required to build ${PROJECT_NAME}")

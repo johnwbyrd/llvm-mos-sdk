@@ -34,3 +34,12 @@ include(CMakeDetermineASMCompiler)
 # At this point, we should know the path for most of the llvm-mos tools.
 # Find llvm-ar, llvm-addr2line, etc. on that path.
 include(CMakeFindBinUtils)
+
+# For some reason, the CMakeFindBinUtils logic doesn't look for llvm-dwarfdump
+find_program(
+    LLVM_MOS_DWARFDUMP 
+    NAMES llvm-dwarfdump
+    HINTS ${LLVM_MOS_TOOL_DIR}
+    )
+set(CMAKE_DWARFDUMP ${LLVM_MOS_DWARFDUMP}
+    CACHE PATH "Path to llvm-dwarfdump utility with llvm-mos support")

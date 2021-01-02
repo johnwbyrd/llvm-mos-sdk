@@ -1,3 +1,1 @@
-# add_executable(hello-world hello-world.s)
-
 llvm_mos_add_executable(hello-world hello-world.s)
