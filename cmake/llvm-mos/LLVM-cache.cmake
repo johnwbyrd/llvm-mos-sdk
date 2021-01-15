@@ -1,8 +1,6 @@
 # LLVM.cmake
 # For priming the cache before building LLVM itself (not the llvm-mos SDK)
 
-include_guard(GLOBAL)
-
 set(LLVM_TARGETS_TO_BUILD "X86" 
     CACHE STRING "LLVM targets to build")
 set(LLVM_EXPERIMENTAL_TARGETS_TO_BUILD "MOS" 

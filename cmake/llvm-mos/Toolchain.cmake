@@ -3,6 +3,8 @@
 include_guard(GLOBAL)
 
 include(llvm-mos/Constants)
+# Now that constants are set, we can bootstrap the local compilers
+include(llvm-mos/BootstrapCompilers)
 include(llvm-mos/VerifyCompilers)
 include(llvm-mos/ToolchainFlags)
 include(llvm-mos/AddExecutable)

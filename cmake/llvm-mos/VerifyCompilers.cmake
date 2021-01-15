@@ -17,10 +17,10 @@ endif()
 # Verify that llvm-mc exists
 # Try copying the path from CMAKE_C_COMPILER first
 get_filename_component(LLVM_MOS_C_COMPILER_DIR ${CMAKE_C_COMPILER} DIRECTORY)
-set(LLVM_MOS_ORIGINAL_ASM_DIR "NOTFOUND")
+set(LLVM_MOS_ORIGINAL_ASM_COMPILER_DIR "NOTFOUND")
 # Try copying the path from CMAKE_ASM_COMPILER next
 if (${CMAKE_ASM_COMPILER})
-  get_filename_component(LLVM_MOS_ORIGINAL_ASM_DIR ${CMAKE_ASM_COMPILER}
+  get_filename_component(LLVM_MOS_ORIGINAL_ASM_COMPILER_DIR ${CMAKE_ASM_COMPILER}
   DIRECTORY)
 endif()
 # On the first search for llvm-mc, if the user has overridden the default
@@ -28,7 +28,7 @@ endif()
 if (LLVM_MOS_ASSEMBLER_PATH STREQUAL LLVM_MOS_ASSEMBLER_PATH-NOTFOUND)
   find_program(LLVM_MOS_ASSEMBLER_PATH 
     NAMES ${LLVM_MOS_ASSEMBLER_NAME}
-    HINTS ${LLVM_MOS_ASSEMBLER_PATH} ${LLVM_MOS_ORIGINAL_ASM_DIR} 
+    HINTS ${LLVM_MOS_ASSEMBLER_PATH} ${LLVM_MOS_ORIGINAL_ASM_COMPILER_DIR} 
       ${LLVM_MOS_C_COMPILER_DIR} 
     )
 endif()
