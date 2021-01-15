@@ -41,8 +41,16 @@ set(LLVM_MOS_GIT_REPOSITORY "https://www.github.com/llvm-mos/llvm-mos.git"
 set(LLVM_MOS_GIT_TAG "origin/main"
   CACHE STRING "Git branch name, tag, or hash from which to pull and boostrap
   the llvm-mos compilers")
+set(LLVM_MOS_LINKER_COMMON_PATH "src/common/linker"
+  CACHE STRING "Relative path to the common linker scripts from root")
+set(LLVM_MOS_LINKER_PLATFORM_PATH "src/platform/linker"
+  CACHE STRING "Relative path to the per-platform linker scripts from root")
+set(LLVM_MOS_LINKER_SCRIPT_EXTENSION  ".ld"
+  CACHE STRING "Extension for linker scripts")
 set(LLVM_MOS_STRIPPED_EXECUTABLE_SUFFIX ".bin"
   CACHE STRING "The default suffix for stripped executables produced by \
   llvm-mos")
+set(LLVM_MOS_PLATFORMS "apple2e;c64;vic20"
+  CACHE STRING "A list of all targets for the SDK.")
 set(LLVM_MOS_TRIPLE "mos"
   CACHE STRING "LLVM triple to use to target MOS processors")
