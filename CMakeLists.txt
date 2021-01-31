@@ -8,4 +8,7 @@ project(llvm-mos-sdk
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 include(llvm-mos/Toolchain)
 
+if(LLVM_MOS_BOOTSTRAP_COMPILER)
+else()
 add_subdirectory(src)
+endif()

@@ -4,7 +4,9 @@ include_guard(GLOBAL)
 
 include(llvm-mos/Constants)
 # Now that constants are set, we can bootstrap the local compilers
+if(LLVM_MOS_BOOTSTRAP_COMPILER)
 include(llvm-mos/BootstrapCompilers)
+else() # LLVM_MOS_BOOTSTRAP_COMPILER
 include(llvm-mos/VerifyCompilers)
 include(llvm-mos/ToolchainFlags)
 include(llvm-mos/AddExecutable)
@@ -45,3 +47,5 @@ find_program(
     )
 set(CMAKE_DWARFDUMP ${LLVM_MOS_DWARFDUMP}
     CACHE PATH "Path to llvm-dwarfdump utility with llvm-mos support")
+
+endif() # LLVM_MOS_BOOTSTRAP_COMPILER

@@ -20,6 +20,7 @@ set(LLDB_INCLUDE_TESTS OFF
 	
 # sccache or ccache may be used to speed up builds, if we can find it 
 # on the path
+if(LLVM_MOS_USE_COMPILER_CACHE)
 find_program(LLVM_MOS_CCACHE 
     NAMES sccache ccache
     DOC "Path to compiler caching program")
@@ -28,12 +29,12 @@ if (NOT LLVM_MOS_CCACHE STREQUAL "LLVM_MOS_CCACHE-NOTFOUND")
         CACHE PATH "Path to C compiler caching program")
     set(CMAKE_CXX_COMPILER_LAUNCHER ${LLVM_MOS_CCACHE}
         CACHE PATH "Path to C++ compiler caching program")
-    message(STATUS "Compiler caching program found at \
+    message(DEBUG "Compiler caching program found at \
         ${CMAKE_C_COMPILER_LAUNCHER}")
 else()
-    message(STATUS "Compiler caching program not found, \
-        compilation may be slower")
+    message(DEBUG "Compiler caching program not found")
 endif()
+endif() # LLVM_MOS_USE_COMPILER_CACHE
 
 # Ship the release with these tools
 set(LLVM_MOS_TOOLCHAIN_TOOLS

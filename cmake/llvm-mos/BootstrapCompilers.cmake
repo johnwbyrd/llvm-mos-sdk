@@ -14,7 +14,7 @@ if(LLVM_MOS_BOOTSTRAP_COMPILER)
             ${LLVM_MOS_BOOTSTRAP_COMPILER_ARGS}
         CMAKE_CACHE_ARGS 
             -DCMAKE_INSTALL_PREFIX:STRING=<INSTALL_DIR>/llvm-mos
-            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+            -DCMAKE_BUILD_TYPE:STRING=Release
             ${LLVM_MOS_BOOTSTRAP_COMPILER_CACHE_ARGS}
         TEST_COMMAND cmake --build . --target distribution
         TEST_BEFORE_INSTALL 1
@@ -25,4 +25,12 @@ if(LLVM_MOS_BOOTSTRAP_COMPILER)
         USES_TERMINAL_INSTALL 1
         USES_TERMINAL_TEST 1
     )
+
+# If you're bootstrapping, you definitely want to use this compiler during
+# the next go around
+set(CMAKE_C_COMPILER ${BINARY_DIR}/clang)
+set(CMAKE_CXX_COMPILER ${BINARY_DIR}/clang++)
+
+set(LLVM_MOS_BOOTSTRAP_COMPILER OFF CACHE BOOL "Bootstrapping completed")
+
 endif(LLVM_MOS_BOOTSTRAP_COMPILER)

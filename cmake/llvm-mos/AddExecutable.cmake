@@ -11,6 +11,9 @@ function(llvm_mos_add_executable)
     foreach(platform ${LLVM_MOS_PLATFORMS})
         set(executable ${base_name}-${platform})
         add_executable(${executable} ${ARGV})
+        if(LLVM_MOS_BOOTSTRAP_COMPILER)
+            add_dependencies(${executable} llvm-mos-compiler)
+        endif()
         target_link_options(${executable} 
             PUBLIC 
             -L${CMAKE_SOURCE_DIR}/${LLVM_MOS_LINKER_COMMON_PATH} 
