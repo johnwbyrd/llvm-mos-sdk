@@ -7,7 +7,8 @@
 ; RUN: llvm-dwarfdump --all -v %t.elf
 ; RUN: llvm-objcopy --output-target binary --strip-unneeded %t.elf %t.bin
 
-; .include "c64.inc"
+	.global _start
+	.text
 
 _start:
 	ldx	#$0                     ; CHECK: encoding: [0xa2,0x00]
@@ -26,6 +27,4 @@ done:
 exit:
 	rts                         ; CHECK: encoding: [0x60]
 hello:  
-    .ascii "HELLO, LLVM MOS ASSEMBLER!"
-	.byte 0x0d
-	.asciz "WELCOME TO 2020!"
+    .asciz "HELLO, LLVM MOS ASSEMBLER!"
