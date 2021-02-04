@@ -8,7 +8,7 @@
 ; RUN: llvm-objcopy --output-target binary --strip-unneeded %t.elf %t.bin
 
 	.global _start
-	.text
+	.section .text
 
 _start:
 	ldx	#$0                     ; CHECK: encoding: [0xa2,0x00]

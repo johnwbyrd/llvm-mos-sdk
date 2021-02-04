@@ -1,0 +1,1 @@
+llvm_mos_add_library(c64 OBJECT c64.s)

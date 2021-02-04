@@ -1,6 +1,8 @@
 # AddExecutable.cmake
-# Functions like CMake's default add_executable, but adds a stripping stage
-# to the production of the binary which can be loaded directly on the target.
+# Functions like CMake's default add_executable, but tries to compile and
+# link the files against every platform in ${LLVM_MOS_PLATFORM}. Also, adds a
+# stripping stage to the binary, permitting it to be loaded on every
+# target.
 include_guard(GLOBAL)
 
 function(llvm_mos_add_executable)
@@ -9,17 +11,16 @@ function(llvm_mos_add_executable)
     endif()
     list(POP_FRONT ARGV base_name)
     foreach(platform ${LLVM_MOS_PLATFORMS})
-        set(executable ${base_name}-${platform})
+        set(executable ${base_name}.${platform})
         add_executable(${executable} ${ARGV})
-        if(LLVM_MOS_BOOTSTRAP_COMPILER)
-            add_dependencies(${executable} llvm-mos-compiler)
-        endif()
         target_link_options(${executable} 
             PUBLIC 
+            -flavor gnu
             -L${CMAKE_SOURCE_DIR}/${LLVM_MOS_LINKER_COMMON_PATH} 
             -L${CMAKE_SOURCE_DIR}/${LLVM_MOS_LINKER_PLATFORM_PATH}/${platform}
             -T${platform}${LLVM_MOS_LINKER_SCRIPT_EXTENSION}
             ) 
+        target_link_libraries(${executable} $<TARGET_OBJECTS:${platform}>)
         add_custom_command(
             TARGET ${executable}
             POST_BUILD

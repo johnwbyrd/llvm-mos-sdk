@@ -43,7 +43,7 @@ ENTRY(_start)
 
 MEMORY
 {
-	flash (rxa!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x1000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x1000 
+	flash (rxa!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x1000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x0800 
 	ram (wxa!r)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x2000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x8000 
 }
 
@@ -59,11 +59,8 @@ SECTIONS
 {
 	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
 
-	.__llvm_mos_basic ALIGN(1) : {
-		KEEP (*(.__llvm_mos_basic.*))
-	} >REGION_LOAD_ADDRESS AT>REGION_LOAD_ADDRESS :text
-
 	.init ALIGN(1) : {
+		KEEP (*(.text.llvm_mos_executable_header .text.llvm_mos_executable_header.*))
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
 		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
@@ -118,7 +115,7 @@ SECTIONS
 	} >flash AT>flash :text
 	PROVIDE(__exidx_end = .);
 
-	. = ALIGN(8);
+	. = ALIGN(1);
 
 	.preinit_array : {
 		PROVIDE_HIDDEN ( __preinit_array_start = . );

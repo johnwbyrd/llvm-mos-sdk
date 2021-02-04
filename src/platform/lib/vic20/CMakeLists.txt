@@ -1,0 +1,1 @@
+llvm_mos_add_library(vic20 OBJECT vic20.s)

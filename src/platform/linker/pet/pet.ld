@@ -1,3 +1,3 @@
-__flash = 0x07ff;
+__flash = 0x03ff;
 INCLUDE picolibc.ld
 

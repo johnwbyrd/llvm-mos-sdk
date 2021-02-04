@@ -1,0 +1,1 @@
+llvm_mos_add_library(pet OBJECT pet.s)
