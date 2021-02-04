@@ -1,5 +1,8 @@
 ; apple2.s
 
+.global llvm_mos_chrout
+llvm_mos_chrout = 0xfded
+
 ; apple2 gets no load address in the output file
 .macro llvm_mos_basic_load_address
 .endm
@@ -11,5 +14,3 @@
 
 .include "basicheader.s"
 
-; Send a character to the output.
-llvm_mos_chrout = 0xfded

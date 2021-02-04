@@ -1,6 +1,8 @@
 ; vic20.s
 
-; Commodore has a two-byte load address header in a program file. 
+.global llvm_mos_chrout
+llvm_mos_chrout = 0xffd2
+
 .macro llvm_mos_basic_load_address
 	.short $1001
 .endm
@@ -11,5 +13,3 @@
 
 .include "basicheader.s"
 
-; Send a character to the output.
-llvm_mos_chrout = 0xffd2
