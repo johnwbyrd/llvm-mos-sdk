@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.10)
 project(llvm-mos-sdk 
   DESCRIPTION "LLVM-based SDK for the MOS 65xx series of processors"
   HOMEPAGE_URL "https://github.com/llvm-mos/llvm-mos-sdk"

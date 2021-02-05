@@ -27,7 +27,7 @@ function(llvm_mos_add_library)
             COMMAND ${CMAKE_DWARFDUMP} --all -v
                 $<TARGET_FILE:${library}> >
                 $<TARGET_FILE_DIR:${library}>/$<TARGET_FILE_BASE_NAME:${library}>.dwarfdump
-    )
+        )
     endif() # LLVM_MOS_GENERATE_LINK_REPORTS
 endfunction()
 
