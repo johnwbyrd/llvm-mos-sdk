@@ -8,11 +8,22 @@ set(LLVM_EXPERIMENTAL_TARGETS_TO_BUILD "MOS"
 set(LLVM_ENABLE_PROJECTS clang;clang-tools-extra;lld
     CACHE STRING "LLVM projects to enable")
 set(LIBXML2_LIBRARIES "IGNORE" 
-    CACHE STRING "LibXML2 libraries")
+    CACHE STRING "Ignore LibXML2 libraries")
 set(LLVM_INSTALL_TOOLCHAIN_ONLY ON 
     CACHE BOOL "LLVM install toolchain only")
-set(CMAKE_BUILD_TYPE Release 
+
+# The following options are principally to reduce space on Github action
+# runner builds. They make smaller, and possibly slower, releases; but the
+# releases are already over 1GB without them on most platforms.  If you have
+# more disk space, you may not need them.
+set(CMAKE_BUILD_TYPE MinSizeRel 
     CACHE STRING "CMake build type")
+if(NOT WIN32)
+    set(LLVM_BUILD_LLVM_DYLIB ON 
+        CACHE BOOL "Build LLVM dynamic libraries")
+    set(LLVM_LINK_LLVM_DYLIB ON 
+        CACHE BOOL "Link LLVM dynamic libraries")
+endif(NOT WIN32)
 	
 # disable lldb testing until the lldb tests stabilize
 set(LLDB_INCLUDE_TESTS OFF 
