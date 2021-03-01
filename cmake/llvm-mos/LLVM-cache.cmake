@@ -16,14 +16,14 @@ set(LLVM_INSTALL_TOOLCHAIN_ONLY ON
 # runner builds. They make smaller, and possibly slower, releases; but the
 # releases are already over 1GB without them on most platforms.  If you have
 # more disk space, you may not need them.
-set(CMAKE_BUILD_TYPE MinSizeRel 
+set(CMAKE_BUILD_TYPE Release 
     CACHE STRING "CMake build type")
-if(NOT WIN32)
+if(LLVM_MOS_BUILD_DYNAMIC_LIBRARIES)
     set(LLVM_BUILD_LLVM_DYLIB ON 
         CACHE BOOL "Build LLVM dynamic libraries")
     set(LLVM_LINK_LLVM_DYLIB ON 
         CACHE BOOL "Link LLVM dynamic libraries")
-endif(NOT WIN32)
+endif(LLVM_MOS_BUILD_DYNAMIC_LIBRARIES)
 	
 # disable lldb testing until the lldb tests stabilize
 set(LLDB_INCLUDE_TESTS OFF 
